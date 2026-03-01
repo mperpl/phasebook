@@ -1,0 +1,6 @@
+session:{session_uuid} -> user_id, last_refresh
+user_sessions:{id} -> session token (smembers to read)
+
+user_profile:{id} -> id, email, username, is_verified, bio
+
+provider:{provider_name} -> provider_id
