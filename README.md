@@ -5,19 +5,23 @@ An asynchronous backend service built in **Python 3.12**. This project focuses o
 
 ## 🚀 Technical Highlights
 
-* **Asynchronous Architecture**: Fully non-blocking I/O using `asyncpg` for PostgreSQL and `redis-py` for caching.
-* **Multi-Layer Session Management**: 
-    * Uses signed session cookies via `SessionMiddleware`.
-    * Implements backend session tracking in Redis to allow for instant session invalidation and "logout from all devices" functionality.
-* **OAuth2 Integration**: Supports social login via Google, GitHub, and Facebook.
-    * Features a smart account-linking system that prevents duplicate accounts while maintaining security.
-* **Performance Caching**: 
-    * User profiles are cached in Redis Hashes to minimize expensive db hits and json string deserialization.
-    * Automated cache invalidation on profile updates (Bio/Username).
-* **Security & Rate Limiting**: 
-    * Implements `slowapi` for fixed-window rate limiting on sensitive routes like `/login` and `/register`.
-    * Password hashing using industry-standard `pwdlib`.
-    * Uses Pydantic `SecretStr` for sensitive data to prevent accidental logging.
+### 🔐 Hybrid Session Management
+Unlike standard stateless JWT implementations, this project uses a **Stateful Hybrid Approach**:
+* **Client-Side**: Signed session cookies via `SessionMiddleware` for secure transport.
+* **Server-Side**: Session tracking in **Redis**.
+* **Benefit**: Allows for absolute control over user sessions, including **instant logout from all devices** and protection against stale session hijacking, which is a common limitation of pure JWT.
+
+### ⚡ Performance Optimization (Caching Strategy)
+* **Redis Hash Caching**: User profiles and frequently accessed metadata are stored as Redis Hashes. This avoids expensive PostgreSQL joins and reduces JSON serialization overhead.
+* **Cache Invalidation**: Implements "write-through" or "stale-on-update" logic where the Redis cache is automatically updated or purged when user data changes (e.g., bio updates, username changes).
+
+### 🔗 OAuth2 Flow
+* Supports **Google, GitHub, and Facebook** social logins for good user experience.
+
+### 🛠 Security & Reliability
+* **Rate Limiting**: Integrated `slowapi` to mitigate brute-force attacks on sensitive endpoints (`/login`, `/register`).
+* **Background Tasks**: Non-blocking email delivery for account verification using `FastAPI-Mail` and `BackgroundTasks`.
+* **Data Integrity**: Strict validation using **Pydantic v2** and type-safety with Python's latest type hinting.
 
 ## 🛠 Tech Stack
 
@@ -41,7 +45,7 @@ This project is in active development. The following features are planned in ord
 2.  **Chat Bot**: An AI bot set up to answer project related questions.
 3.  **Social Graph**: Friends system and user relationships.
 4.  **Real-time Communication**: Private chat between friends.
-5.  **ANd all the other ideas that I will come up with.
+5.  And all the other ideas that I will come up with.
 6.  **DevOps**: Dockerization and unit/integration testing.
 
 ## 🕷 Known Issues
