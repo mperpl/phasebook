@@ -41,18 +41,17 @@ The core relational models include:
 ## 📅 Project Roadmap
 
 This project is in active development. The following features are planned in order of priority:
-1.  **Content System**: Full CRUD for Posts and Comments.
-2.  **Chat Bot**: An AI bot set up to answer project related questions.
-3.  **Social Graph**: Friends system and user relationships.
-4.  **Real-time Communication**: Private chat between friends.
-5.  And all the other ideas that I will come up with.
-6.  **DevOps**: Dockerization and unit/integration testing.
+1.  **Chat Bot**: An AI bot set up to answer project related questions.
+2.  **Social Graph**: Friends system and user relationships.
+3.  **Real-time Communication**: Private chat between friends.
+4.  And all the other ideas that I will come up with.
+5.  **DevOps**: Dockerization and unit/integration testing.
 
 ## 🕷 Known Issues
-1.  Deserve to be called a Social Media API.
-2.  Currently using auto-incrementing Integers for IDs. Will transition to **UUID4** for better security.
-3.  Lack of oauth account linking. The project will eventually support accounts with multiple login options.
-4.  DB optimizations. There are some lazy written SQLAlchemy queries. Project too big to care about every little optimization.
-5.  Some places could be more DRY.
-6.  The limiter limits by ip of the household. Not an issue for developmnet.
-
+1.  Currently using auto-incrementing Integers for IDs. Will transition to **UUID4** for better security.
+2.  Lack of oauth account linking. The project will eventually support accounts with multiple login options.
+3.  DB optimizations. There are some lazy written SQLAlchemy queries. Project too big to care about every little optimization.
+4.  Some places could be more DRY.
+5.  The limiter limits by ip of the household. Not an issue for developmnet.
+6.  Hashing exclusive to user sessions and profile data. Will expand the cache use to other areas in the future.
+7.  Can't use github with hidden email to register.
