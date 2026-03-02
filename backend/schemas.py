@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field, EmailStr, SecretStr
 
@@ -54,3 +55,36 @@ class UserUpdateBio(BaseModel):
 
 class UserUpdateUsername(BaseModel):
     username: str = Field(min_length=3, max_length=32)
+
+
+
+class WritePost(BaseModel):
+    content: str
+
+class ReadPost(BaseModel):
+    author_id: int
+    content: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+
+class WriteComment(BaseModel):
+    content: str = Field(..., min_length=1, max_length=1000)
+
+class CommentRead(BaseModel):
+    id: int
+    content: str
+    author_id: int
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+class PostDiscussionRead(BaseModel):
+    id: int
+    title: str
+    content: str
+    author_id: int
+    # This is the magic line that nests the comments
+    comments: list[CommentRead] = []
+
+    model_config = ConfigDict(from_attributes=True)

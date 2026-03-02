@@ -9,6 +9,7 @@ from database.database import DB_SESSION, get_db
 from services.auth.sessions.logout import logout_user
 from services.auth.sessions.identity.get_current_user import CURRENT_USER
 from services.auth.sessions.identity.guest_endpoint import GUEST_ENDPOINT
+from services.auth.sessions.logout_all import logout_all
 from services.auth.standard.forgot_password.forgot_password_email import forgot_password_email
 from services.auth.standard.forgot_password.forgot_password_reset import forgot_password_reset
 from services.auth.standard.register_new_user import register_new_user
@@ -104,6 +105,14 @@ async def logout(request: Request, response: Response):
     return message
 
 
+@router.post("/logout-all")
+@limiter.limit("2/minute")
+async def logout_global(request: Request, response: Response, user: CURRENT_USER):
+    session_id = await logout_all(int(user.id))
+    message = {"message": "Logout successful", "session_id": session_id} if session_id else {"message": "No active session found"}
+    return message
+
+
 @router.get("/{provider}")
 @limiter.limit("2/minute")
 async def login_via_provider(request: Request, provider: str, _: GUEST_ENDPOINT):
@@ -118,13 +127,7 @@ async def login_via_provider(request: Request, provider: str, _: GUEST_ENDPOINT)
 
 @router.get("/oauth2/{provider}")
 @limiter.limit("2/minute")
-async def auth_by_provider(
-    request: Request, 
-    provider: str, 
-    response: Response, 
-    db: DB_SESSION,
-    _: GUEST_ENDPOINT
-):
+async def auth_by_provider(request: Request, provider: str, response: Response, db: DB_SESSION,_: GUEST_ENDPOINT):
     client = oauth.create_client(provider)
     user = await oauth2_service(db, response, client, provider, request)
 

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from endpoints import auth, users, posts
+from endpoints import ai, auth, users, posts
 from core.limiter import limiter
 from core.config import settings
 
@@ -40,6 +40,7 @@ app.add_middleware(
     secret_key=settings.MIDDLEWARE_SECRET_KEY
 )
 
+app.include_router(ai.router, prefix="/ai", tags=["ai"])
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(posts.router, prefix="/posts", tags=["posts"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])

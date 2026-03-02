@@ -1,5 +1,5 @@
 from typing import List, Optional
-from sqlalchemy import ForeignKey, Integer, String, Text, Boolean, UniqueConstraint
+from sqlalchemy import ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.database import Base
 # TRUNCATE TABLE 
@@ -17,7 +17,7 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     username: Mapped[Optional[str]] = mapped_column(String(32), unique=True, index=True, nullable=True)
-    email: Mapped[str] = mapped_column(String(254), unique=True, index=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(254), unique=True, index=True, nullable=True)
     bio: Mapped[str] = mapped_column(String(255), nullable=True)
     hashed_password: Mapped[str] = mapped_column(String(128), nullable=True)
     is_verified: Mapped[bool] = mapped_column(default=False)
@@ -68,12 +68,8 @@ class Post(Base):
     __tablename__ = "posts"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    author_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
-    )
-    title: Mapped[str] = mapped_column(String(255), nullable=False)
-    body: Mapped[str] = mapped_column(Text, nullable=False)
-    is_published: Mapped[bool] = mapped_column(Boolean, default=False)
+    author_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
 
     author: Mapped["User"] = relationship(back_populates="posts")
     comments: Mapped[List["Comment"]] = relationship(
@@ -85,13 +81,13 @@ class Comment(Base):
     __tablename__ = "comments"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(
+    author_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     post_id: Mapped[int] = mapped_column(
         ForeignKey("posts.id", ondelete="CASCADE"), nullable=False
     )
-    body: Mapped[str] = mapped_column(Text, nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
     parent_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("comments.id", ondelete="CASCADE"), nullable=True
     )
