@@ -20,18 +20,12 @@ async def post(request: Request, post_data: WritePost, db: DB_SESSION, current_u
 
 @router.post("/{post_id}/comment")
 @limiter.limit("2/minute")
-async def comment(
-    request: Request, 
-    db: DB_SESSION, 
-    post_id: int, 
-    comment_data: WriteComment, 
-    current_user: ACTIVATED_USER
-):
+async def comment(request: Request, db: DB_SESSION, post_id: int, comment_data: WriteComment, current_user: ACTIVATED_USER):
     success = await make_comment(db, post_id, comment_data, current_user)
     return success
 
 
-@router.post("/{post_id}/discuss")
+@router.get("/{post_id}/discuss")
 @limiter.limit("2/minute")
 async def read_post_discussion_by_id(request: Request,db: DB_SESSION, post_id: int):
     success = await read_post_discussion(db, post_id)

@@ -33,7 +33,7 @@ async def get_current_user_profile(request: Request, current_user: CURRENT_USER)
     return current_user
 
 
-@router.post("/refresh")
+@router.put("/refresh")
 @limiter.limit("1/minute")
 async def refresh_current_user_profile(request: Request, db: DB_SESSION, current_user: CURRENT_USER):
     success = await generate_user_cache(db, int(current_user.id))
@@ -54,14 +54,14 @@ async def get_user_profile_by_id(request: Request, id: int, db: DB_SESSION):
 #     return success
 
 
-@router.post("/edit/bio")
+@router.patch("/edit/bio")
 @limiter.limit("2/minute")
 async def update_current_bio(request: Request, db: DB_SESSION, current_user: CURRENT_USER, new_data: UserUpdateBio):
     success = await update_bio(db, new_data, int(current_user.id))
     return success
 
 
-@router.post("/edit/username")
+@router.patch("/edit/username")
 @limiter.limit("2/minute")
 async def update_current_profile(request: Request, db: DB_SESSION, current_user: CURRENT_USER, new_data: UserUpdateUsername):
     success = await update_username(db, int(current_user.id), new_data)

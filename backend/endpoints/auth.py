@@ -31,7 +31,7 @@ async def delete_user(request: Request, user: CURRENT_USER, db: AsyncSession = D
     return {"detail": success}
 
 
-@router.post("/refresh-session")
+@router.put("/refresh-session")
 @limiter.limit("1/minute")
 async def ping(request: Request, _: CURRENT_USER):
     return {"detail": "session refreshed"}
@@ -44,7 +44,7 @@ async def register(request: Request, user_data: UserRegister, db: DB_SESSION, _:
     return {"message": "Registration successful", "user": user}
 
 
-@router.post("/verify/{token}")
+@router.get("/verify/{token}")
 @limiter.limit("2/minute")
 async def verify(request: Request, db: DB_SESSION, token: str):
     user = await verify_account(db, token)
@@ -76,7 +76,7 @@ async def forgot_password(request: Request, email: EmailStr, background_tasks: B
 
 
 # test using postman - browser send a get request when you click on a link
-@router.post("/forgot-password/{token}")
+@router.patch("/forgot-password/{token}")
 @limiter.limit("3/day")
 async def forgot_password_verified(request: Request, db: DB_SESSION, token: str, password_data: UserForgotPassword):
     success = await forgot_password_reset(password_data, token, db)
@@ -90,7 +90,7 @@ async def reset_user_password(request: Request, background_tasks: BackgroundTask
     return {'message': 'Mail sent successfully'} if success else {'message': 'Failed to proceed with password reset'}
 
 
-@router.post("/password-reset/{token}")
+@router.patch("/password-reset/{token}")
 @limiter.limit("1/day")
 async def reset_user_password_verified(request: Request, db: DB_SESSION, token: str):
     success = await password_reset(token, db)
@@ -105,7 +105,7 @@ async def logout(request: Request, response: Response):
     return message
 
 
-@router.post("/logout-all")
+@router.delete("/logout-all")
 @limiter.limit("2/minute")
 async def logout_global(request: Request, response: Response, user: CURRENT_USER):
     session_id = await logout_all(int(user.id))
@@ -113,7 +113,7 @@ async def logout_global(request: Request, response: Response, user: CURRENT_USER
     return message
 
 
-@router.get("/{provider}")
+@router.get("/oauth2/login/{provider}")
 @limiter.limit("2/minute")
 async def login_via_provider(request: Request, provider: str, _: GUEST_ENDPOINT):
     if provider.lower() not in SUPPORTED_PROVIDERS:
@@ -125,7 +125,7 @@ async def login_via_provider(request: Request, provider: str, _: GUEST_ENDPOINT)
     return await client.authorize_redirect(request, redirect_uri)
 
 
-@router.get("/oauth2/{provider}")
+@router.get("/oauth2/callback/{provider}")
 @limiter.limit("2/minute")
 async def auth_by_provider(request: Request, provider: str, response: Response, db: DB_SESSION,_: GUEST_ENDPOINT):
     client = oauth.create_client(provider)
