@@ -1,0 +1,3 @@
+TRUNCATE TABLE users, oauth_accounts, oauth_providers, posts, comments RESTART IDENTITY CASCADE;
+
+INSERT INTO oauth_providers (provider) VALUES ('google'), ('facebook'), ('github');

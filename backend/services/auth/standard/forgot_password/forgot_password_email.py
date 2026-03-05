@@ -1,11 +1,11 @@
 from fastapi import BackgroundTasks
 from pydantic import EmailStr
 from sqlalchemy import select
+from database.models.user import User
 from services.email.service import send_forgot_password_email
 from services.redis_token.TokenPrefix import TokenPrefix
 from services.redis_token.generate_redis_token import generate_redis_token
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import User
 
 
 async def forgot_password_email(email: EmailStr, background_tasks: BackgroundTasks, db: AsyncSession):

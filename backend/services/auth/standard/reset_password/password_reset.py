@@ -1,8 +1,9 @@
 from fastapi import HTTPException
+from database.models.user import User
 from services.redis_token.TokenPrefix import TokenPrefix
 from services.redis_token.get_user_id_by_key import get_user_id_by_key
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import User
+
 
 # TODO update logic to be update first rathare than select->update
 async def password_reset(token: str, db: AsyncSession):

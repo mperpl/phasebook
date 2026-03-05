@@ -2,7 +2,7 @@ from time import time
 import uuid
 from fastapi import HTTPException, Response
 from core.config import settings
-from models import User
+from database.models.user import User
 from database.redis import redis_client
 
 async def create_user_session(response: Response, user: User) -> str:

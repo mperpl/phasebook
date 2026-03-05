@@ -2,7 +2,9 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import Post
+
+from database.models.post import Post
+
 
 # TODO implement pagination
 async def show_posts_by_user_id(db: AsyncSession, user_id: int):

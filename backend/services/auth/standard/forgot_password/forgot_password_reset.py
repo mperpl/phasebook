@@ -2,11 +2,11 @@ from fastapi import HTTPException
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.exc import SQLAlchemyError
 from core.security import get_password_hash
-from schemas import UserForgotPassword
+from database.models.user import User
+from schemas.user import UserForgotPassword
 from services.redis_token.TokenPrefix import TokenPrefix
 from services.redis_token.get_user_id_by_key import get_user_id_by_key
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import User
 
 
 async def forgot_password_reset(password_data: UserForgotPassword, token: str, db: AsyncSession):

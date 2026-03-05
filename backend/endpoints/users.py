@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from core.limiter import limiter
 from database.database import DB_SESSION
-from schemas import UserRead, UserUpdateBio, UserUpdateUsername
+from schemas.user import UserRead, UserUpdateBio, UserUpdateUsername
 from services.account_management.update_username import update_username
 from services.account_management.generate_user_cache import generate_user_cache
 from services.account_management.update_bio import update_bio

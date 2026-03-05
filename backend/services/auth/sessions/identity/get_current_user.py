@@ -2,11 +2,12 @@ from time import time
 from typing import Annotated
 from fastapi import Depends, HTTPException, Request, status
 from database.database import DB_SESSION
+from database.models.user import User
 from database.redis import redis_client
 from core.config import settings
-from schemas import UserSessionContext
-from models import User
 from sqlalchemy import select
+
+from schemas.user import UserSessionContext
 
 async def get_current_user(request: Request, db: DB_SESSION) -> UserSessionContext:
     session_uuid = request.cookies.get("session_uuid")

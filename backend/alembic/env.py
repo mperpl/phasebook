@@ -7,8 +7,12 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from database.database import Base, SQLALCHEMY_DATABASE_URL
-import models  # noqa: F401
+from database.database import SQLALCHEMY_DATABASE_URL
+from database.models.base import Base  # noqa: F401
+from database.models.user import User, OAuthAccount  # noqa: F401
+from database.models.provider import OAuthProvider  # noqa: F401
+from database.models.post import Post  # noqa: F401
+from database.models.comment import Comment  # noqa: F401
 
 
 # this is the Alembic Config object, which provides

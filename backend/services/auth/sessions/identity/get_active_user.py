@@ -1,7 +1,6 @@
 from typing import Annotated
-
 from fastapi import Depends, HTTPException, status
-from schemas import UserSessionContext
+from schemas.user import UserSessionContext
 from services.auth.sessions.identity.get_current_user import CURRENT_USER
 
 

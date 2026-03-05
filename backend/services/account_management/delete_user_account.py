@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
-from models import User
 from sqlalchemy.ext.asyncio import AsyncSession
+from database.models.user import User
 from database.redis import redis_client
 
 

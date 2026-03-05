@@ -1,27 +1,23 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import Comment
-from schemas import WriteComment
+from database.models.comment import Comment
+from schemas.comment import WriteComment
 from services.auth.sessions.identity.get_active_user import ACTIVATED_USER
 
-async def make_comment(
-    db: AsyncSession, 
-    post_id: int, 
-    comment_data: WriteComment, 
-    current_user: ACTIVATED_USER
-) -> Comment:
-    new_comment = Comment(
+async def comment_response(db: AsyncSession, post_id: int, parent_comment_id: int,comment_data: WriteComment, current_user: ACTIVATED_USER) -> Comment:
+    response_comment = Comment(
         **comment_data.model_dump(),
         post_id=post_id,
-        author_id=current_user.id
+        author_id=current_user.id,
+        parent_id=parent_comment_id
     )
 
+    db.add(response_comment)
     try:
-        db.add(new_comment)
         await db.commit()
-        await db.refresh(new_comment)
-        return new_comment
+        await db.refresh(response_comment)
+        return response_comment
         
     except SQLAlchemyError:
         await db.rollback()

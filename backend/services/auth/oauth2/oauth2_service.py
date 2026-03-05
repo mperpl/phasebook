@@ -2,7 +2,7 @@ from authlib.integrations.starlette_client import OAuth
 from fastapi import Request, Response
 from starlette.config import Config
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import User
+from database.models.user import User
 from services.auth.oauth2.login_or_register_user.service import login_or_register_user
 from services.auth.oauth2.SUPPORTED_PROVIDERS import SUPPORTED_PROVIDERS
 from services.auth.oauth2.get_users_from_providers import get_user_from_provider

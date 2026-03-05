@@ -1,7 +1,7 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, Request, HTTPException, Response
 from pydantic import EmailStr
 from core.limiter import limiter
-from schemas import UserForgotPassword, UserLogin, UserPasswordReset, UserRead, UserRegister
+from schemas.user import UserForgotPassword, UserLogin, UserPasswordReset, UserRead, UserRegister
 from services.account_management.delete_user_account import delete_user_account
 from services.auth.oauth2.oauth2_service import oauth, oauth2_service
 from services.auth.oauth2.SUPPORTED_PROVIDERS import SUPPORTED_PROVIDERS

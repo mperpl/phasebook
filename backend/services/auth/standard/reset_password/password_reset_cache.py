@@ -1,8 +1,8 @@
 from fastapi import BackgroundTasks, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from core.security import get_password_hash, verify_password
-from models import User
-from schemas import UserPasswordReset, UserSessionContext
+from database.models.user import User
+from schemas.user import UserPasswordReset, UserSessionContext
 from services.email.service import send_password_reset_email
 from services.redis_token.TokenPrefix import TokenPrefix
 from services.redis_token.generate_redis_token import generate_redis_token

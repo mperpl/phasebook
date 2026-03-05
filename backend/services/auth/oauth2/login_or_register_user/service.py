@@ -4,10 +4,9 @@ from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from database.models.user import OAuthAccount, User
 from services.auth.oauth2.login_or_register_user._get_cached_provider_id import _get_cached_provider_id
 from services.auth.sessions.create_user_session import create_user_session
-from models import OAuthAccount, User
-
 
 async def login_or_register_user(db: AsyncSession, response: Response, normalized_user: Dict[str, Any]) -> User:
     provider_id = await _get_cached_provider_id(db, normalized_user["provider"])

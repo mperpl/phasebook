@@ -2,10 +2,11 @@ from fastapi.concurrency import run_in_threadpool
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status, Response
-from models import User
 from core.security import verify_password
+from database.models.user import User
+from schemas.user import UserLogin
 from services.auth.sessions.create_user_session import create_user_session
-from schemas import UserLogin
+
 
 async def login_user(db: AsyncSession, user_data: UserLogin, response: Response) -> User:
     """ Login logic. returns User instance on success, raises HTTPException on failure.

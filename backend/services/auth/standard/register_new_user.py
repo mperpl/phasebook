@@ -3,9 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import BackgroundTasks, HTTPException, status, Response
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.orm import load_only
-from models import User
 from core.security import get_password_hash
-from schemas import UserRegister
+from database.models.user import User
+from schemas.user import UserRegister
 from services.auth.sessions.create_user_session import create_user_session
 from services.email.service import send_registration_email
 from services.redis_token.TokenPrefix import TokenPrefix

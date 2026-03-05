@@ -1,5 +1,5 @@
 from fastapi import BackgroundTasks, HTTPException
-from schemas import UserSessionContext
+from schemas.user import UserSessionContext
 from services.email.service import send_registration_email
 from services.redis_token.TokenPrefix import TokenPrefix
 from services.redis_token.generate_redis_token import generate_redis_token
