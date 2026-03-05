@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Request
 from core.limiter import limiter
 from database.database import DB_SESSION
 from schemas import UserRead, UserUpdateBio, UserUpdateUsername
