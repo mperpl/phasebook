@@ -5,9 +5,14 @@ from schemas.user import UserRead, UserUpdateBio, UserUpdateUsername
 from services.account_management.update_username import update_username
 from services.account_management.generate_user_cache import generate_user_cache
 from services.account_management.update_bio import update_bio
+from services.auth.sessions.identity.get_active_user import ACTIVATED_USER
 from services.auth.sessions.identity.get_current_user import CURRENT_USER
 from services.posts.show_posts_by_user_id import show_posts_by_user_id
+from services.social.accept_friend import accept_friend
+from services.social.block_user import block_user
+from services.social.delete_relationship import delete_relationship
 from services.social.find_user_by_id import find_user_by_id
+from services.social.add_friend import add_friend
 
 
 router = APIRouter()
@@ -25,6 +30,36 @@ async def display_my_posts(request: Request, db: DB_SESSION, current_user: CURRE
 async def display_posts_by_user_id(request: Request, db: DB_SESSION, id: int):
     posts = await show_posts_by_user_id(db, id)
     return posts
+
+
+@router.put("/add/{receiver_id}")
+@limiter.limit("2/minute")
+async def friend(request: Request, db: DB_SESSION, receiver_id: int, user: ACTIVATED_USER):
+    return await add_friend(db, int(user.id), receiver_id)
+
+
+@router.patch("/accept/{sender_id}")
+@limiter.limit("2/minute")
+async def accept_friend_request(request: Request, db: DB_SESSION, sender_id: int, user: ACTIVATED_USER):
+    return await accept_friend(db, int(user.id), sender_id)
+
+
+@router.delete("/unfriend/{friend_id}")
+@limiter.limit("2/minute")
+async def unfriend(request: Request, db: DB_SESSION, friend_id: int, user: ACTIVATED_USER):
+    return await delete_relationship(db, friend_id, int(user.id))
+
+
+@router.put("/block/{receiver_id}")
+@limiter.limit("2/minute")
+async def block(request: Request, db: DB_SESSION, receiver_id: int, user: ACTIVATED_USER):
+    return await block_user(db, receiver_id, int(user.id))
+
+
+@router.delete("/unblock/{receiver_id}")
+@limiter.limit("2/minute")
+async def unblock(request: Request, db: DB_SESSION, reciver_id: int, user: ACTIVATED_USER):
+    return await delete_relationship(db, reciver_id, int(user.id))
 
 
 @router.get("/me", response_model=UserRead)

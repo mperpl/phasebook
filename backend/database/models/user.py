@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
-from sqlalchemy import ForeignKey, String, UniqueConstraint, func
+from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.models.base import Base
 
@@ -14,16 +14,25 @@ class User(Base):
     bio: Mapped[str] = mapped_column(String(255), nullable=True)
     hashed_password: Mapped[str] = mapped_column(String(128), nullable=True)
     is_verified: Mapped[bool] = mapped_column(default=False)
-    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
  
     oauth_accounts: Mapped[List["OAuthAccount"]] = relationship(
         back_populates="user", cascade="all, delete-orphan", passive_deletes=True
     )
+    
     posts: Mapped[List["Post"]] = relationship(  # noqa: F821 # type: ignore
         back_populates="author", cascade="all, delete-orphan", passive_deletes=True
     )
+
     comments: Mapped[List["Comment"]] = relationship(  # noqa: F821 # type: ignore
         back_populates="author", cascade="all, delete-orphan", passive_deletes=True
+    )
+
+    sent_requests: Mapped[list["Friendship"]] = relationship(  # noqa: F821 # type: ignore
+        "Friendship", foreign_keys="[Friendship.sender_id]", back_populates="sender"
+    )
+    received_requests: Mapped[list["Friendship"]] = relationship(  # noqa: F821 # type: ignore
+        "Friendship", foreign_keys="[Friendship.receiver_id]", back_populates="receiver"
     )
 
 

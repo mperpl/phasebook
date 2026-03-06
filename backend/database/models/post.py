@@ -11,6 +11,7 @@ class Post(Base, TimestampMixin):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     author_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    is_public: Mapped[bool] = mapped_column(nullable=False)
 
     author: Mapped["User"] = relationship(back_populates="posts")  # type: ignore # noqa: F821
     comments: Mapped[List["Comment"]] = relationship(  # type: ignore # noqa: F821

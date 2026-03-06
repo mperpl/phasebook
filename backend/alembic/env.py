@@ -10,6 +10,7 @@ from alembic import context
 from database.database import SQLALCHEMY_DATABASE_URL
 from database.models.base import Base  # noqa: F401
 from database.models.user import User, OAuthAccount  # noqa: F401
+from database.models.friendship import Friendship  # noqa: F401
 from database.models.provider import OAuthProvider  # noqa: F401
 from database.models.post import Post  # noqa: F401
 from database.models.comment import Comment  # noqa: F401
