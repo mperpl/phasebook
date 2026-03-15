@@ -16,44 +16,31 @@ class User(Base):
     is_verified: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
  
-    oauth_accounts: Mapped[List["OAuthAccount"]] = relationship(
-        back_populates="user", cascade="all, delete-orphan", passive_deletes=True
-    )
+    oauth_accounts: Mapped[List["OAuthAccount"]] = relationship(back_populates="user", cascade="all, delete-orphan", passive_deletes=True)
     
-    posts: Mapped[List["Post"]] = relationship(  # noqa: F821 # type: ignore
-        back_populates="author", cascade="all, delete-orphan", passive_deletes=True
-    )
+    posts: Mapped[List["Post"]] = relationship(back_populates="author", cascade="all, delete-orphan", passive_deletes=True)  # noqa: F821 # type: ignore
+    comments: Mapped[List["Comment"]] = relationship(back_populates="author", cascade="all, delete-orphan", passive_deletes=True)  # noqa: F821 # type: ignore
 
-    comments: Mapped[List["Comment"]] = relationship(  # noqa: F821 # type: ignore
-        back_populates="author", cascade="all, delete-orphan", passive_deletes=True
-    )
+    sent_requests: Mapped[list["Friendship"]] = relationship("Friendship", foreign_keys="[Friendship.sender_id]", back_populates="sender")  # noqa: F821 # type: ignore
+    received_requests: Mapped[list["Friendship"]] = relationship("Friendship", foreign_keys="[Friendship.receiver_id]", back_populates="receiver")  # noqa: F821 # type: ignore
 
-    sent_requests: Mapped[list["Friendship"]] = relationship(  # noqa: F821 # type: ignore
-        "Friendship", foreign_keys="[Friendship.sender_id]", back_populates="sender"
-    )
-    received_requests: Mapped[list["Friendship"]] = relationship(  # noqa: F821 # type: ignore
-        "Friendship", foreign_keys="[Friendship.receiver_id]", back_populates="receiver"
-    )
+    participations: Mapped[List["Participant"]] = relationship(back_populates="user", cascade="all, delete-orphan")  # noqa: F821 # type: ignore
+    sent_messages: Mapped[List["Message"]] = relationship(back_populates="sender", cascade="all, delete-orphan")  # noqa: F821 # type: ignore
+    
 
 
 class OAuthAccount(Base):
     __tablename__ = "oauth_accounts"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
-    )
-    provider_id: Mapped[int] = mapped_column(
-        ForeignKey("oauth_providers.id", ondelete="CASCADE"), nullable=False
-    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    provider_id: Mapped[int] = mapped_column(ForeignKey("oauth_providers.id", ondelete="CASCADE"), nullable=False)
     provider_user_id: Mapped[str] = mapped_column(String(255), nullable=False)
 
     provider: Mapped["OAuthProvider"] = relationship(back_populates="oauth_accounts")  # type: ignore # noqa: F821
     user: Mapped["User"] = relationship(back_populates="oauth_accounts")
 
-    __table_args__ = (
-        UniqueConstraint("provider_id", "provider_user_id", name="uq_provider_user"),
-    )
+    __table_args__ = (UniqueConstraint("provider_id", "provider_user_id", name="uq_provider_user"),)
 
 
 

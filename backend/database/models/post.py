@@ -14,7 +14,5 @@ class Post(Base, TimestampMixin):
     is_public: Mapped[bool] = mapped_column(nullable=False)
 
     author: Mapped["User"] = relationship(back_populates="posts")  # type: ignore # noqa: F821
-    comments: Mapped[List["Comment"]] = relationship(  # type: ignore # noqa: F821
-        back_populates="post", cascade="all, delete-orphan", passive_deletes=True
-    )
+    comments: Mapped[List["Comment"]] = relationship(back_populates="post", cascade="all, delete-orphan", passive_deletes=True)  # type: ignore # noqa: F821
 

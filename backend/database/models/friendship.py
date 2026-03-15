@@ -20,12 +20,8 @@ class Friendship(Base, TimestampMixin):
     status: Mapped[FriendshipStatus] = mapped_column(sqlEnum(FriendshipStatus), default=FriendshipStatus.PENDING, nullable=False)
     action_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
  
-    sender: Mapped["User"] = relationship(  # noqa: F821 # type: ignore
-        "User", foreign_keys=[sender_id], back_populates="sent_requests"
-    )
-    receiver: Mapped["User"] = relationship(  # noqa: F821 # type: ignore
-        "User", foreign_keys=[receiver_id], back_populates="received_requests"
-    )
+    sender: Mapped["User"] = relationship("User", foreign_keys=[sender_id], back_populates="sent_requests")  # noqa: F821 # type: ignore
+    receiver: Mapped["User"] = relationship("User", foreign_keys=[receiver_id], back_populates="received_requests")  # noqa: F821 # type: ignore
 
     __table_args__ = (
         UniqueConstraint("sender_id", "receiver_id", name="uq_friendship_sender_receiver"),

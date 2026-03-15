@@ -13,3 +13,7 @@ wheels/
 dump.rdb
 
 .vscode/
+
+
+chat/
+chat.py

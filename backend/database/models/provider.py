@@ -10,7 +10,5 @@ class OAuthProvider(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     provider: Mapped[str] = mapped_column(String(16), nullable=False)
     
-    oauth_accounts: Mapped[List["OAuthAccount"]] = relationship(  # noqa: F821 # type: ignore
-        back_populates="provider", cascade="all, delete-orphan", passive_deletes=True
-    )
+    oauth_accounts: Mapped[List["OAuthAccount"]] = relationship(back_populates="provider", cascade="all, delete-orphan", passive_deletes=True)  # noqa: F821 # type: ignore
 
