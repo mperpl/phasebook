@@ -5,8 +5,7 @@ from database.redis import redis_client
 
 async def guest_endpoint(request: Request):
     """
-    If a session_id cookie exists, we assume the user is logged in
-    and prevent them from accessing the route.
+    Lock logged in users from accessing the route.
     """
     session_uuid = request.cookies.get("session_uuid")
     

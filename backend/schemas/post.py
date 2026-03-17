@@ -1,18 +1,21 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 from schemas.comment import CommentRead
 
 
 class WritePost(BaseModel):
+    is_public: bool = True
     content: str
 
 
 class ReadPost(BaseModel):
     author_id: int
     content: str
+    is_public: bool
     created_at: datetime
-    updated_at: datetime
+    updated_at: Optional[datetime]
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -22,8 +22,8 @@ async def delete_user_account(db: AsyncSession, user_id: int):
         await db.commit()
         if keys_to_delete:
             await redis_client.delete(*keys_to_delete)
-    except Exception as e:
+    except Exception:
         await db.rollback()
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to delete user: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to delete user")
     
     return True

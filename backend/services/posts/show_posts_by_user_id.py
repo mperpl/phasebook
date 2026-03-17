@@ -10,6 +10,5 @@ async def show_posts_by_user_id(db: AsyncSession, user_id: int):
         stmt = select(Post).where(Post.author_id == user_id).options()
         posts = (await db.execute(stmt)).scalars().all()
         return posts
-    except SQLAlchemyError as e:
-        print(f"DEBUG: {str(e)}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+    except SQLAlchemyError:
+        raise HTTPException(status_code=500, detail="Internal server error,")

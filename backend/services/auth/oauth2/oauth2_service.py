@@ -8,7 +8,7 @@ from services.auth.oauth2.SUPPORTED_PROVIDERS import SUPPORTED_PROVIDERS
 from services.auth.oauth2.get_users_from_providers import get_user_from_provider
 from services.auth.oauth2.register_oauth_providers import register_oauth_providers
 
-config = Config('.env')
+config = Config('../.env')
 oauth = OAuth(config)
 register_oauth_providers(SUPPORTED_PROVIDERS, oauth)
 

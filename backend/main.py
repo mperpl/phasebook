@@ -1,4 +1,7 @@
 from contextlib import asynccontextmanager
+from sqlalchemy.dialects.postgresql import insert
+from database.models.provider import OAuthProvider
+from database.database import SessionLocal
 from database.redis import redis_client
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +15,16 @@ from core.config import settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    async with SessionLocal() as session:
+        stmt = insert(OAuthProvider).values([
+            {"provider": "google"},
+            {"provider": "facebook"},
+            {"provider": "github"}
+        ]).on_conflict_do_nothing(index_elements=["provider"])
+        
+        await session.execute(stmt)
+        await session.commit()
+    
     yield
     await redis_client.aclose()
 
@@ -39,6 +52,14 @@ app.add_middleware(
     https_only=settings.COOKIE_SECURE,
     secret_key=settings.MIDDLEWARE_SECRET_KEY
 )
+
+@app.get("/health")
+async def health():
+    try:
+        await redis_client.ping()
+        return {"status": "healthy"}
+    except Exception:
+        return {"status": "degraded\n"}
 
 app.include_router(ai.router, prefix="/ai", tags=["ai"])
 app.include_router(users.router, prefix="/users", tags=["users"])

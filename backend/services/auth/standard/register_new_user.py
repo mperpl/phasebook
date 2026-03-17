@@ -53,7 +53,7 @@ async def register_new_user(db: AsyncSession, user_data: UserRegister, response:
     try:
         key = await generate_redis_token(new_user.id, TokenPrefix.VERIFY_EMAIL, 300)
         background_tasks.add_task(send_registration_email, new_user.email, key)
-    except Exception as e:
-        print("Failed to send verification email:", str(e))
+    except Exception:
+        print("Failed to send verification email")
 
     return new_user

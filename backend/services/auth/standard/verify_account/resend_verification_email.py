@@ -11,7 +11,7 @@ async def resend_verification_email(background_tasks: BackgroundTasks, user: Use
     try:
         key = await generate_redis_token(user.id, TokenPrefix.VERIFY_EMAIL, expire_seconds=300)
         background_tasks.add_task(send_registration_email, user.email, key)
-    except Exception as e:
-        print("Failed to send verification email:", str(e))
+    except Exception:
+        print("Failed to send verification email")
         raise HTTPException(status_code=500, detail="Failed to resend verification email")
     return True

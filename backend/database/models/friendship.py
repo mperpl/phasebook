@@ -18,7 +18,7 @@ class Friendship(Base, TimestampMixin):
     sender_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False)
     receiver_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=True)
     status: Mapped[FriendshipStatus] = mapped_column(sqlEnum(FriendshipStatus), default=FriendshipStatus.PENDING, nullable=False)
-    action_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    action_by_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
  
     sender: Mapped["User"] = relationship("User", foreign_keys=[sender_id], back_populates="sent_requests")  # noqa: F821 # type: ignore
     receiver: Mapped["User"] = relationship("User", foreign_keys=[receiver_id], back_populates="received_requests")  # noqa: F821 # type: ignore

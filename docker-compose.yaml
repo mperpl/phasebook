@@ -1,0 +1,46 @@
+services:
+  api:
+    build: .
+    container_name: fastapi_api
+    # Volume mount enables "Hot Reload" during development
+    volumes:
+      - ./backend:/app/backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - REDIS_HOST=redis
+      - DB_HOST=postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  postgres:
+    image: postgres:16
+    ports:
+      - "6543:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=postgres
+      - POSTGRES_DB=blog_app
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    env_file:
+      - .env
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+volumes:
+  postgres_data:
+  redis_data:

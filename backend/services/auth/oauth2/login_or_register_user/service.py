@@ -76,8 +76,8 @@ async def login_or_register_user(db: AsyncSession, response: Response, normalize
         await create_user_session(response, user)
         await db.commit()
         await db.refresh(user)
-    except IntegrityError:
+    except IntegrityError as e:
         await db.rollback()
-        raise HTTPException(status_code=409, detail="Account registration conflict")
+        raise HTTPException(status_code=409, detail=f"Account registration conflict {e}")
     
     return user

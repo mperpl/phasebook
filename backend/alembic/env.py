@@ -7,20 +7,28 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from database.database import SQLALCHEMY_DATABASE_URL
-from database.models.base import Base  # noqa: F401
+from core.config import settings
+from database.models.base import Base
+import database.models # noqa: F401
+from database.models.base import Base  # noqa: F401, F811
 from database.models.user import User, OAuthAccount  # noqa: F401
-from database.models.friendship import Friendship  # noqa: F401
+from database.models.friendship import Friendship, FriendshipStatus  # noqa: F401
+from database.models.chat import Conversation, Participant, Message  # noqa: F401
 from database.models.provider import OAuthProvider  # noqa: F401
 from database.models.post import Post  # noqa: F401
 from database.models.comment import Comment  # noqa: F401
+# from database.models.user import User, OAuthAccount  # noqa: F401
+# from database.models.chat import Conversation, Participant, Message  # noqa: F401
+# from database.models.provider import OAuthProvider  # noqa: F401
+# from database.models.post import Post  # noqa: F401
+# from database.models.comment import Comment  # noqa: F401
 
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)
+config.set_main_option("sqlalchemy.url", settings.DB_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

@@ -22,8 +22,8 @@ async def password_reset(token: str, db: AsyncSession):
     try:
         await db.commit()
         await db.refresh(user)
-    except Exception as e:
+    except Exception:
         await db.rollback()
-        raise HTTPException(status_code=409, detail=f"Failed to reset the password: [ERROR]: {e}")
+        raise HTTPException(status_code=409, detail="Failed to reset the password: [ERROR]")
 
     return True
