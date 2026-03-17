@@ -1,10 +1,10 @@
 from fastapi import HTTPException, status
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.models.user import User
-from database.redis import redis_client
 
 
-async def delete_user_account(db: AsyncSession, user_id: int):
+async def delete_user_account(db: AsyncSession, user_id: int, redis_client: Redis):
     user = await db.get(User, user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")

@@ -1,11 +1,11 @@
 from fastapi import HTTPException
+from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.models.user import User
-from database.redis import redis_client
 from core.config import settings
 
-async def generate_user_cache(db: AsyncSession, user_id: int) -> bool:
+async def generate_user_cache(db: AsyncSession, user_id: int, redis_client: Redis) -> bool:
     stmt = select(User).where(User.id == user_id)
     user = (await db.execute(stmt)).scalar_one_or_none()
         

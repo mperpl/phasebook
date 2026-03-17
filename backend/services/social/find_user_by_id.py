@@ -1,13 +1,13 @@
 from fastapi import HTTPException
 from pydantic import ValidationError
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.models.user import User
-from database.redis import redis_client
 from core.config import settings
 from schemas.user import UserRead
 
 
-async def find_user_by_id(db: AsyncSession, id: int) -> UserRead:
+async def find_user_by_id(db: AsyncSession, id: int, redis_client: Redis) -> UserRead:
     profile_key = f"user_profile:{id}"
     user_data = await redis_client.hgetall(profile_key)
     

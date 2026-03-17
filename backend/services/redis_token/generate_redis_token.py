@@ -1,9 +1,9 @@
 import secrets
+from redis.asyncio import Redis
 from core.config import settings
-from database.redis import redis_client
 from services.redis_token.TokenPrefix import TokenPrefix
 
-async def generate_redis_token(user_id: int, prefix: TokenPrefix, expire_seconds: int = settings.USER_REDIS_SESSION_TTL) -> str:
+async def generate_redis_token(user_id: int, prefix: TokenPrefix, redis_client: Redis, expire_seconds: int = settings.USER_REDIS_SESSION_TTL) -> str:
     """
     Stores a token in Redis with a TTL (default 15m).
     Key format: 'TokenPrefix:{token}' -> Value: user_id

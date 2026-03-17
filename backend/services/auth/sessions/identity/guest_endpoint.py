@@ -1,9 +1,11 @@
 from typing import Annotated
 from fastapi import HTTPException, Request, status
-from fastapi.params import Depends
-from database.redis import redis_client
+from fastapi import Depends
+from redis.asyncio import Redis
+from database.redis import get_redis
 
-async def guest_endpoint(request: Request):
+
+async def guest_endpoint(request: Request, redis_client: Redis = Depends(get_redis)):
     """
     Lock logged in users from accessing the route.
     """

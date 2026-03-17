@@ -1,5 +1,6 @@
 from typing import Any, Dict
 from fastapi import HTTPException, Response, status
+from redis.asyncio import Redis
 from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,8 +9,8 @@ from database.models.user import OAuthAccount, User
 from services.auth.oauth2.login_or_register_user._get_cached_provider_id import _get_cached_provider_id
 from services.auth.sessions.create_user_session import create_user_session
 
-async def login_or_register_user(db: AsyncSession, response: Response, normalized_user: Dict[str, Any]) -> User:
-    provider_id = await _get_cached_provider_id(db, normalized_user["provider"])
+async def login_or_register_user(db: AsyncSession, response: Response, normalized_user: Dict[str, Any], redis_client: Redis) -> User:
+    provider_id = await _get_cached_provider_id(db, normalized_user["provider"], redis_client)
 
     stmt = (
         select(User)
@@ -31,7 +32,7 @@ async def login_or_register_user(db: AsyncSession, response: Response, normalize
         
         if is_linked:
             # PATH A: Known OAuth User
-            await create_user_session(response, user)
+            await create_user_session(response, user, redis_client)
             await db.commit()
             return user
         
@@ -52,7 +53,7 @@ async def login_or_register_user(db: AsyncSession, response: Response, normalize
             db.add(new_oauth)
             
             try:
-                await create_user_session(response, user)
+                await create_user_session(response, user, redis_client)
                 await db.commit()
                 await db.refresh(user)
                 return user
@@ -73,7 +74,7 @@ async def login_or_register_user(db: AsyncSession, response: Response, normalize
     db.add(new_oauth)
 
     try:
-        await create_user_session(response, user)
+        await create_user_session(response, user, redis_client)
         await db.commit()
         await db.refresh(user)
     except IntegrityError as e:

@@ -1,15 +1,16 @@
 from time import time
 from typing import Annotated
 from fastapi import Depends, HTTPException, Request, status
+from redis.asyncio import Redis
+from database.redis import get_redis
 from database.database import DB_SESSION
 from database.models.user import User
-from database.redis import redis_client
 from core.config import settings
 from sqlalchemy import select
-
 from schemas.user import UserSessionContext
 
-async def get_current_user(request: Request, db: DB_SESSION) -> UserSessionContext:
+
+async def get_current_user(request: Request, db: DB_SESSION, redis_client: Redis = Depends(get_redis)) -> UserSessionContext:
     session_uuid = request.cookies.get("session_uuid")
     if not session_uuid:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")

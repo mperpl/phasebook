@@ -1,11 +1,12 @@
 from fastapi import HTTPException, status
+from redis.asyncio import Redis
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.models.user import User
-from database.redis import redis_client
 from schemas.user import UserUpdateBio
 
-async def update_bio(db: AsyncSession, new_data: UserUpdateBio, id: int) -> bool:
+
+async def update_bio(db: AsyncSession, new_data: UserUpdateBio, id: int, redis_client: Redis) -> bool:
     stmt = (
         update(User)
         .where(User.id == id)

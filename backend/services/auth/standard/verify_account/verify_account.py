@@ -1,14 +1,15 @@
 from fastapi import HTTPException
+from redis.asyncio import Redis
 from sqlalchemy.future import select
 from sqlalchemy.orm import load_only
 from database.models.user import User
-from database.redis import redis_client
 from sqlalchemy.ext.asyncio import AsyncSession
 from services.redis_token.TokenPrefix import TokenPrefix
 from services.redis_token.get_user_id_by_key import get_user_id_by_key
 from core.config import settings
 
-async def verify_account(db: AsyncSession, token: str) -> bool:
+
+async def verify_account(db: AsyncSession, token: str, redis_client: Redis) -> bool:
     key = f'{TokenPrefix.VERIFY_EMAIL}:{token}'
 
     user_id = await get_user_id_by_key(key)

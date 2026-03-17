@@ -1,7 +1,8 @@
 from fastapi import HTTPException, Request, Response, status
-from database.redis import redis_client
+from redis.asyncio import Redis
 
-async def logout_user(request: Request, response: Response):
+
+async def logout_user(request: Request, response: Response, redis_client: Redis):
     session_uuid = request.cookies.get("session_uuid")
     if not session_uuid:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired")

@@ -1,4 +1,5 @@
 from fastapi.concurrency import run_in_threadpool
+from redis.asyncio import Redis
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status, Response
@@ -8,7 +9,7 @@ from schemas.user import UserLogin
 from services.auth.sessions.create_user_session import create_user_session
 
 
-async def login_user(db: AsyncSession, user_data: UserLogin, response: Response) -> User:
+async def login_user(db: AsyncSession, user_data: UserLogin, response: Response, redis_client: Redis) -> User:
     """ Login logic. returns User instance on success, raises HTTPException on failure.
     Args:
         db: DB_SESSSION (db instance for database operations)
@@ -54,6 +55,6 @@ async def login_user(db: AsyncSession, user_data: UserLogin, response: Response)
             detail="Invalid identifier or password"
         )
     
-    await create_user_session(response, user)
+    await create_user_session(response, user, redis_client)
     
     return user

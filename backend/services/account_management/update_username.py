@@ -1,11 +1,11 @@
 from fastapi import HTTPException, status
+from redis.asyncio import Redis
 from sqlalchemy import or_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.models.user import User
-from database.redis import redis_client
 from schemas.user import UserUpdateUsername
 
-async def update_username(db: AsyncSession, user_id: int, new_data: UserUpdateUsername) -> bool:
+async def update_username(db: AsyncSession, user_id: int, new_data: UserUpdateUsername, redis_client: Redis) -> bool:
     cache_key = f"user_profile:{user_id}"
     
     try:

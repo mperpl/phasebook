@@ -1,6 +1,7 @@
-from database.redis import redis_client
+from redis.asyncio import Redis
 
-async def get_user_id_by_key(key: str) -> int | None:
+
+async def get_user_id_by_key(key: str, redis_client: Redis) -> int | None:
     """ Retrieves user_id as str and immediately deletes the token (single use). """
     user_id = await redis_client.get(key)
     if user_id:

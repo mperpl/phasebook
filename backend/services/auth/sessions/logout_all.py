@@ -1,6 +1,7 @@
-from database.redis import redis_client
+from redis.asyncio import Redis
 
-async def logout_all(user_id: int) -> bool:
+
+async def logout_all(user_id: int, redis_client: Redis) -> bool:
     index_key = f"user_sessions:{user_id}"
     profile_key = f"user_profile:{user_id}"
     

@@ -1,10 +1,11 @@
 from typing import Optional
+from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.models.provider import OAuthProvider
-from database.redis import redis_client
 
-async def _get_cached_provider_id(db: AsyncSession, provider_name: str) -> Optional[int]:
+
+async def _get_cached_provider_id(db: AsyncSession, provider_name: str, redis_client: Redis) -> Optional[int]:
     """Retrieves provider ID from Redis, or DB if not cached."""
     key = f"provider:{provider_name}"
     

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request
+from database.redis import REDIS_SESSION
 from core.limiter import limiter
 from database.database import DB_SESSION
 from schemas.user import UserRead, UserUpdateBio, UserUpdateUsername
@@ -70,15 +71,15 @@ async def get_current_user_profile(request: Request, current_user: CURRENT_USER)
 
 @router.put("/refresh")
 @limiter.limit("1/minute")
-async def refresh_current_user_profile(request: Request, db: DB_SESSION, current_user: CURRENT_USER):
-    success = await generate_user_cache(db, int(current_user.id))
+async def refresh_current_user_profile(request: Request, db: DB_SESSION, current_user: CURRENT_USER, redis: REDIS_SESSION):
+    success = await generate_user_cache(db, int(current_user.id), redis)
     return success
 
 
 @router.get("/{id}")
 @limiter.limit("2/minute")
-async def get_user_profile_by_id(request: Request, id: int, db: DB_SESSION):
-    profile = await find_user_by_id(db, id)
+async def get_user_profile_by_id(request: Request, id: int, db: DB_SESSION, redis: REDIS_SESSION):
+    profile = await find_user_by_id(db, id, redis)
     return profile
 
 # TODO insecure to let users generate caches on profiles other than theirs
@@ -91,14 +92,14 @@ async def get_user_profile_by_id(request: Request, id: int, db: DB_SESSION):
 
 @router.patch("/edit/bio")
 @limiter.limit("2/minute")
-async def update_current_bio(request: Request, db: DB_SESSION, current_user: CURRENT_USER, new_data: UserUpdateBio):
-    success = await update_bio(db, new_data, int(current_user.id))
+async def update_current_bio(request: Request, db: DB_SESSION, current_user: CURRENT_USER, new_data: UserUpdateBio, redis: REDIS_SESSION):
+    success = await update_bio(db, new_data, int(current_user.id), redis)
     return success
 
 
 @router.patch("/edit/username")
 @limiter.limit("2/minute")
-async def update_current_profile(request: Request, db: DB_SESSION, current_user: CURRENT_USER, new_data: UserUpdateUsername):
-    success = await update_username(db, int(current_user.id), new_data)
+async def update_current_profile(request: Request, db: DB_SESSION, current_user: CURRENT_USER, new_data: UserUpdateUsername, redis: REDIS_SESSION):
+    success = await update_username(db, int(current_user.id), new_data, redis)
     return success
 

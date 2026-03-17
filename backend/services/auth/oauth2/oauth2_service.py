@@ -1,5 +1,6 @@
 from authlib.integrations.starlette_client import OAuth
 from fastapi import Request, Response
+from redis.asyncio import Redis
 from starlette.config import Config
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.models.user import User
@@ -12,8 +13,8 @@ config = Config('../.env')
 oauth = OAuth(config)
 register_oauth_providers(SUPPORTED_PROVIDERS, oauth)
 
-async def oauth2_service(db: AsyncSession, response: Response, client, provider: str, request: Request) -> User:
+async def oauth2_service(db: AsyncSession, response: Response, client, provider: str, request: Request, redis_client: Redis) -> User:
     """Handles full OAuth2 flow: exchanges code, gets user info, and initializes Redis session."""
     normalized_user = await get_user_from_provider(client, provider, request)
-    user = await login_or_register_user(db, response, normalized_user)
+    user = await login_or_register_user(db, response, normalized_user, redis_client)
     return user

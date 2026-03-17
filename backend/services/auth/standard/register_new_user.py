@@ -1,3 +1,4 @@
+from redis.asyncio import Redis
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import BackgroundTasks, HTTPException, status, Response
@@ -11,7 +12,7 @@ from services.email.service import send_registration_email
 from services.redis_token.TokenPrefix import TokenPrefix
 from services.redis_token.generate_redis_token import generate_redis_token
 
-async def register_new_user(db: AsyncSession, user_data: UserRegister, response: Response,  background_tasks: BackgroundTasks):
+async def register_new_user(db: AsyncSession, user_data: UserRegister, response: Response,  background_tasks: BackgroundTasks, redis_client: Redis):
     """
     Returns a User instance on successful registration and sets a session cookie.
     Args:
@@ -48,7 +49,7 @@ async def register_new_user(db: AsyncSession, user_data: UserRegister, response:
         await db.rollback()
         raise HTTPException(status_code=500, detail=f"Registration failed during background processing [ERROR]: {e}")
     
-    await create_user_session(response, new_user)
+    await create_user_session(response, new_user, redis_client)
 
     try:
         key = await generate_redis_token(new_user.id, TokenPrefix.VERIFY_EMAIL, 300)

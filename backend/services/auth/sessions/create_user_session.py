@@ -1,12 +1,12 @@
 from time import time
 import uuid
 from fastapi import HTTPException, Response
+from redis.asyncio import Redis
 from core.config import settings
 from database.models.user import User
-from database.redis import redis_client
 
 
-async def create_user_session(response: Response, user: User) -> str:
+async def create_user_session(response: Response, user: User, redis_client: Redis) -> str:
     session_uuid = str(uuid.uuid4())
 
     session_key = f"session:{session_uuid}"

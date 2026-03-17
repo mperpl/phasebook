@@ -1,11 +1,12 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, Request, HTTPException, Response
+from fastapi import APIRouter, BackgroundTasks, Request, HTTPException, Response
 from pydantic import EmailStr
+from database.redis import REDIS_SESSION
 from core.limiter import limiter
 from schemas.user import UserForgotPassword, UserLogin, UserPasswordReset, UserRead, UserRegister
 from services.account_management.delete_user_account import delete_user_account
 from services.auth.oauth2.oauth2_service import oauth, oauth2_service
 from services.auth.oauth2.SUPPORTED_PROVIDERS import SUPPORTED_PROVIDERS
-from database.database import DB_SESSION, get_db
+from database.database import DB_SESSION
 from services.auth.sessions.logout import logout_user
 from services.auth.sessions.identity.get_current_user import CURRENT_USER
 from services.auth.sessions.identity.guest_endpoint import GUEST_ENDPOINT
@@ -18,7 +19,6 @@ from services.auth.standard.reset_password.password_reset import password_reset
 from services.auth.standard.reset_password.password_reset_cache import password_reset_cache
 from services.auth.standard.verify_account.verify_account import verify_account
 from services.auth.standard.verify_account.resend_verification_email import resend_verification_email
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 router = APIRouter()
@@ -26,8 +26,8 @@ router = APIRouter()
 
 @router.delete("/delete")
 @limiter.limit("1/minute")
-async def delete_user(request: Request, user: CURRENT_USER, db: AsyncSession = Depends(get_db)):
-    success = await delete_user_account(db, int(user.id))
+async def delete_user(request: Request, user: CURRENT_USER, db: DB_SESSION, redis: REDIS_SESSION):
+    success = await delete_user_account(db, int(user.id), redis)
     return {"detail": success}
 
 
@@ -39,15 +39,15 @@ async def ping(request: Request, _: CURRENT_USER):
 
 @router.post("/register")
 @limiter.limit("5/minute")
-async def register(request: Request, user_data: UserRegister, db: DB_SESSION, _: GUEST_ENDPOINT, response: Response, background_tasks: BackgroundTasks):
-    user = await register_new_user(db, user_data, response, background_tasks)
+async def register(request: Request, user_data: UserRegister, db: DB_SESSION, _: GUEST_ENDPOINT, response: Response, background_tasks: BackgroundTasks, redis: REDIS_SESSION):
+    user = await register_new_user(db, user_data, response, background_tasks, redis)
     return {"message": "Registration successful", "user": user}
 
 
 @router.get("/verify/{token}")
 @limiter.limit("2/minute")
-async def verify(request: Request, db: DB_SESSION, token: str):
-    user = await verify_account(db, token)
+async def verify(request: Request, db: DB_SESSION, token: str, redis: REDIS_SESSION):
+    user = await verify_account(db, token, redis)
     return {"message": "Verification successful", "user": user}
 
 
@@ -63,8 +63,8 @@ async def resend_verification(request: Request, background_tasks: BackgroundTask
 
 @router.post("/login", response_model=UserRead)
 @limiter.limit("5/minute")
-async def login(request: Request, user_data: UserLogin, db: DB_SESSION, _: GUEST_ENDPOINT, response: Response):
-    user = await login_user(db, user_data, response)
+async def login(request: Request, user_data: UserLogin, db: DB_SESSION, _: GUEST_ENDPOINT, response: Response, redis: REDIS_SESSION):
+    user = await login_user(db, user_data, response, redis)
     return user
 
 
@@ -99,16 +99,16 @@ async def reset_user_password_verified(request: Request, db: DB_SESSION, token: 
 
 @router.post("/logout")
 @limiter.limit("2/minute")
-async def logout(request: Request, response: Response):
-    session_id = await logout_user(request, response)
+async def logout(request: Request, response: Response, redis: REDIS_SESSION):
+    session_id = await logout_user(request, response, redis)
     message = {"message": "Logout successful", "session_id": session_id} if session_id else {"message": "No active session found"}
     return message
 
 
 @router.delete("/logout-all")
 @limiter.limit("2/minute")
-async def logout_global(request: Request, response: Response, user: CURRENT_USER):
-    session_id = await logout_all(int(user.id))
+async def logout_global(request: Request, response: Response, user: CURRENT_USER, redis: REDIS_SESSION):
+    session_id = await logout_all(int(user.id), redis)
     message = {"message": "Logout successful", "session_id": session_id} if session_id else {"message": "No active session found"}
     return message
 
@@ -127,8 +127,8 @@ async def login_via_provider(request: Request, provider: str, _: GUEST_ENDPOINT)
 
 @router.get("/oauth2/callback/{provider}")
 @limiter.limit("2/minute")
-async def auth_by_provider(request: Request, provider: str, response: Response, db: DB_SESSION,_: GUEST_ENDPOINT):
+async def auth_by_provider(request: Request, provider: str, response: Response, db: DB_SESSION,_: GUEST_ENDPOINT, redis: REDIS_SESSION):
     client = oauth.create_client(provider)
-    user = await oauth2_service(db, response, client, provider, request)
+    user = await oauth2_service(db, response, client, provider, request, redis)
 
     return {"status": "ok", "username": user.username}

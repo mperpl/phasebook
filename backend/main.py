@@ -59,7 +59,7 @@ async def health():
         await redis_client.ping()
         return {"status": "healthy"}
     except Exception:
-        return {"status": "degraded\n"}
+        return {"status": "degraded"}
 
 app.include_router(ai.router, prefix="/ai", tags=["ai"])
 app.include_router(users.router, prefix="/users", tags=["users"])
